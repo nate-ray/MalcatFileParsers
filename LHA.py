@@ -53,21 +53,5 @@ class LHAAnalyzer(FileTypeAnalyzer):
           self.confirm()
           self.size = self.tell()
       
-"""
-	def parse(self, hint):
-		yield Bytes(1, name="header size", category=Type.HEADER)
-		yield Bytes(1, name="header checksum", category=Type.HEADER)
-		yield Bytes(5, name="method id", category=Type.HEADER)
-		compressedLength = yield Bytes(4, name="compressed file size", category=Type.HEADER)
-		yield Bytes(4, name="uncompressed file size", category=Type.HEADER)
-		yield Bytes(4, name="original file date/time", category=Type.HEADER)
-		yield Bytes(1, name="file attribute", category=Type.HEADER)
-		yield Bytes(1, name="level identifier", category=Type.HEADER)
-		nameLength = yield Bytes(1, name="length of filename", category=Type.HEADER)
-		yield Bytes(int.from_bytes(nameLength, byteorder="little"), name="path and filename", category=Type.HEADER)
-		yield Bytes(2, name="uncompressed crc", category=Type.HEADER)
-		yield Bytes(int.from_bytes(compressedLength, byteorder="little"), name="compressed data", category=Type.DATA)
-		#seen = {}
-		#seen_end = False
-"""
+
 		
