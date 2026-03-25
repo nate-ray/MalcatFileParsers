@@ -29,14 +29,19 @@ class LHAAnalyzer(FileTypeAnalyzer):
           self.size = 0
 
      def open(self, vfile, password=None):
-           import io
-           from lhafile import LhaFile
-           buf = io.BytesIO(self.read(0, self.size))
-           lha = LhaFile(buf)
-           return lha.read(vfile.path)
+          import sys                                                                                                                                                                                 
+          venv_pkgs = "/home/remnux/Desktop/malcat_ubuntu24_v0_9_13/.venv/lib/python3.12/site-packages"                                                                                            
+          if venv_pkgs not in sys.path:                                                                                                                                                              
+               sys.path.insert(0, venv_pkgs)
+          from lhafile import LhaFile
+          hdr, compressed_size = self.filesystem[vfile.path]
+          data_end = hdr.offset + len(hdr) + compressed_size
+          buf = io.BytesIO(self.read(0, data_end) + b'\x00')
+          lha = LhaFile(buf)
+          return lha.read(vfile.path)
       
      def parse(self, hint):
-          while self.remaining() > 1:
+          while self.remaining() >= 1:
                if self.read(self.tell(), 1) == b"\x00":
                     yield Bytes(1, name="end of archive", category=Type.HEADER)
                     break
@@ -46,12 +51,9 @@ class LHAAnalyzer(FileTypeAnalyzer):
                compressed_size = hdr["compressed file size"]
                uncompressed_size = hdr["uncompressed file size"]
                yield Bytes(compressed_size, name="compressed data", category=Type.DATA)
-          if fn:
-               self.filesystem[fn] = (hdr, compressed_size)
-               self.add_file(fn, uncompressed_size, "open")
-               self.add_section(fn, start, self.tell() - start)
-          self.confirm()
+               if fn:
+                    self.filesystem[fn] = (hdr, compressed_size)
+                    self.add_file(fn, uncompressed_size, "open")
+                    self.add_section(fn, start, self.tell() - start)
+               self.confirm()
           self.size = self.tell()
-      
-
-		
